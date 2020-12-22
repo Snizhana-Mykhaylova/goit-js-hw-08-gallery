@@ -2,27 +2,30 @@ import gallery from './gallery-items.js';
 
 const galleryRef = document.querySelector('.gallery.js-gallery');
 const lightboxRef = document.querySelector('.lightbox');
-const btnCloseRef = document.querySelector(
-  'button[data-action= "close-lightbox"]',
-);
 const lightboxImageRef = document.querySelector('.lightbox__image');
 const lightboxOverlayRef = document.querySelector('div.lightbox__overlay');
+const btnCloseRef = document.querySelector('button[data-action= "close-lightbox"]');
+let activIndex = 0;
+
+
 
 // генерит разметку галереи
 gallery.map((item, index) => {
   const galleryItemRef = document.createElement('li');
-  galleryItemRef.classList.add('gallery__item');
-
   const galleryLinkRef = document.createElement('a');
-  galleryLinkRef.classList.add('gallery__link');
-  galleryLinkRef.href = item.original;
-
   const galleryImageRef = document.createElement('img');
+  
+  
+  galleryItemRef.classList.add('gallery__item');
+  galleryLinkRef.classList.add('gallery__link');
   galleryImageRef.classList.add('gallery__image');
+
+  galleryLinkRef.href = item.original;
   galleryImageRef.src = item.preview;
+  galleryImageRef.alt = item.description;
+
   galleryImageRef.setAttribute('data-source', item.original);
   galleryImageRef.setAttribute('data-idx', index);
-  galleryImageRef.alt = item.description;
 
   galleryRef.appendChild(galleryItemRef);
   galleryItemRef.appendChild(galleryLinkRef);
@@ -39,8 +42,10 @@ function showOriginalSize(event) {
     return;
   }
 
+  const activImage = event.target.dataset;
   lightboxRef.classList.add('is-open');
-  lightboxImageRef.src = event.target.dataset.source;
+  lightboxImageRef.src = activImage.source;
+  activIndex = activImage.idx;
 }
 
 // функция закрытия модалки
@@ -64,3 +69,21 @@ window.addEventListener('keydown', event => {
 });
 
 // Пролистывание изображений галереи в открытом модальном окне клавишами "влево" и "вправо"
+window.addEventListener('keydown', event => {
+  if (event.key === 'ArrowRight') {
+    if (activIndex >= 0 && activIndex < gallery.length - 1) {
+      activIndex = Number(activIndex) + 1;
+      lightboxImageRef.src = gallery[activIndex].original;
+    }
+    return;
+  }
+
+  if (event.key === 'ArrowLeft') {
+    if (activIndex > 0 && activIndex <= gallery.length - 1) {
+      activIndex = Number(activIndex) - 1;
+      lightboxImageRef.src = gallery[activIndex].original;
+    }
+    return;
+  }
+});
+
